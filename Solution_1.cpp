@@ -1,29 +1,6 @@
 #include "Solution_1.h"
 #include <vector>
 
-bool operator==(Rectangle lhs, Rectangle rhs){
-    return (lhs.RightUpperPoint.x == rhs.RightUpperPoint.x &&
-            lhs.RightUpperPoint.y == rhs.RightUpperPoint.y &&
-            lhs.LeftDownPoint.y == rhs.LeftDownPoint.y &&
-            lhs.LeftDownPoint.x == rhs.LeftDownPoint.x);
-}
-
-bool operator<(const Rectangle &lhs, const Rectangle &rhs) {
-    if (lhs.LeftDownPoint.x < rhs.LeftDownPoint.x)
-        return true;
-    else if (lhs.LeftDownPoint.x == rhs.LeftDownPoint.x) {
-        if (lhs.LeftDownPoint.y < rhs.LeftDownPoint.y)
-            return true;
-        else if (lhs.LeftDownPoint.y == rhs.LeftDownPoint.y)
-            if (lhs.RightUpperPoint.x < rhs.RightUpperPoint.x ||
-                (lhs.RightUpperPoint.x == rhs.RightUpperPoint.x &&
-                lhs.RightUpperPoint.y < rhs.RightUpperPoint.y))
-                return true;
-    }
-    return false;
-}
-
-
 set<Rectangle> Solution_1::findIntersectionRectangles(const set<Rectangle> &_rectangles) {
     vector<Rectangle> rectangles(begin(_rectangles), end(_rectangles));
     double ldx, ldy, rux, ruy;
@@ -66,8 +43,9 @@ bool Solution_1::findSolution() {
             return false;
     }
     cout << endl;
-    intersectionRectangles = createSolution(intersectionRectangles);
     PrintRectangles(intersectionRectangles);
+//    intersectionRectangles = createSolution(intersectionRectangles);
+//    PrintRectangles(intersectionRectangles);
     return true;
 }
 
@@ -93,8 +71,14 @@ void Solution_1::PrintRectangles(const set<Rectangle> &a) {
     }
 }
 
+
+
 set<Rectangle> Solution_1::createSolution(const set<Rectangle>& _rectangles) {
     set<Rectangle> newSet;
+    for (int i = 0; i < ; ++i) {
+
+    }
+    
     return newSet;
 }
 

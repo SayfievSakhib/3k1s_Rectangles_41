@@ -10,4 +10,5 @@ add_executable(3k1s_Rectangles_41
         Point.h
         Solution_1.cpp
         Solution_1.h
+        RectanglesSet.h
         )
