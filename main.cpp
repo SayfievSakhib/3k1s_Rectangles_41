@@ -13,8 +13,7 @@
 using namespace std;
 
 int main() {
-    GenerateTask41 task(3, 5);
-    task.allSetPoints();
+    string pathname = R"(C:\Users\User\CLionProjects\3k1s_Rectangles_41\X_output.txt)";
+    GenerateTask41 task(10, 1000);
+    task.GenerateTask();
 }
-
-
