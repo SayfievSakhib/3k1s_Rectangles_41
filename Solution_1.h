@@ -6,16 +6,15 @@
 using namespace std;
 
 class Solution_1 : public Basic_41{
-    set<Rectangle> allRectangles;
-    int n;
-    int k;
+    set<Rectangle> inputRectangles;
+    double time;
 public:
-    Solution_1(int _n){
-        n = _n;
+    Solution_1(const set<Rectangle>& _inputRectangles, int _k) : Basic_41() {
+        k = _k;
+        inputRectangles = _inputRectangles;
     }
-    set<Rectangle> findIntersectionRectangles(const set<Rectangle> &rectangles);
-    set<Rectangle> createSolution(const set<Rectangle>& rectangles);
-    bool findSolution();
+    set<Rectangle> taskSolver();
+    double getTime();
 };
 
 

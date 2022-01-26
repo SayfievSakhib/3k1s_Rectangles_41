@@ -13,4 +13,4 @@ add_executable(3k1s_Rectangles_41
         Basic_41.h
         GenerateTask41.cpp
         GenerateTask41.h
-        )
+        Solution_2.cpp Solution_2.h unfinishedFunctiosAndCrazyIdeas.h)

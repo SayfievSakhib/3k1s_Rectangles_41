@@ -2,19 +2,116 @@
 
 
 void GenerateTask41::GenerateTask() {
-    vector<set<set<Rectangle>>> observer(k);
-    bool randomInput = true;
-    int maxK = 1;
+    GenerateInput();
+    answerRectangles = basicTaskSolver(inputRectangles);
+}
 
-    ifstream input;
-    if(!pathname.empty()) {
-        input.open(pathname);
-        randomInput = false;
+
+//Rectangle GenerateTask41::createRectangle() {
+//     int leftBorder1 = 1, rightBorder1 = 5, leftBorder2,
+//    rightBorder2 = 10, leftBorder3, rightBorder3 = 5, denominator = 2;
+//    if(11 <= n && n <= 100){
+//        rightBorder1 *= 2;
+//        rightBorder2 *= 2;
+//        rightBorder3 *= 10;
+//    } else if(101 <= n && n <= 1000){
+//        rightBorder1 *= 4;
+//        rightBorder2 *= 5;
+//        rightBorder3 *= 20;
+//        denominator *= 2;
+//    } else if(1001 <= n && n <= 10000){
+//        rightBorder1 *= 8;
+//        rightBorder2 *= 10;
+//        rightBorder3 *= 30;
+//        denominator *= 3;
+//    } else if(10001 <= n && n <= 100000){
+//        rightBorder1 *= 10;
+//        rightBorder2 *= 12;
+//        rightBorder3 *= 40;
+//        denominator *= 4;
+//    }
+//    leftBorder2 = rightBorder1 + 1;
+//    leftBorder3 = rightBorder2 + 1;
+//
+//    uniform_int_distribution<> uid(int(-n / denominator), int(n / denominator));
+//    uniform_int_distribution<> uid1(leftBorder1, rightBorder1);
+//    uniform_int_distribution<> uid2(leftBorder2, rightBorder2);
+//    uniform_int_distribution<> uid3(leftBorder3, rightBorder3);
+//    uniform_int_distribution<> _uid(0, 20);
+//
+//    double ldx, ldy, rux, ruy;
+//
+//    ldx = double(uid(gen));
+//    ldy = double(uid(gen));
+//
+//    int m = _uid(gen);
+//
+//    if(m % 20 == 0) {
+//        rux = ldx + uid3(gen);
+//        ruy = ldy + uid3(gen);
+//    } else if(m % 3 == 0){
+//        rux = ldx + uid2(gen);
+//        ruy = ldy + uid2(gen);
+//    } else {
+//        rux = ldx + uid1(gen);
+//        ruy = ldy + uid1(gen);
+//    }
+//
+//    return {{ldx, ldy}, {rux, ruy}};
+//}
+
+
+Rectangle GenerateTask41::createRectangle() {
+    int rightBorder1 = int (5 + rightBorder1Coefficient.first * sqrt(n) - n / rightBorder1Coefficient.second),
+        rightBorder2 = int(10 + rightBorder2Coefficient.first * sqrt(n) - n / rightBorder2Coefficient.second),
+        rightBorder3 = int(20 + rightBorder3Coefficient.first * sqrt(n) - n / rightBorder3Coefficient.second);
+
+
+    int leftBorder1 = 1,
+        leftBorder2 = rightBorder1 + 1,
+        leftBorder3 = rightBorder2 + 1;
+
+    int denominator = 2;
+    denominator += int(n / denominatorCoefficient.first);
+    denominator -= int(n / denominatorCoefficient.second);
+
+    uniform_int_distribution<> uid(int(-n / denominator), int(n / denominator));
+    uniform_int_distribution<> uid1(leftBorder1, rightBorder1);
+    uniform_int_distribution<> uid2(leftBorder2, rightBorder2);
+    uniform_int_distribution<> uid3(leftBorder3, rightBorder3);
+    uniform_int_distribution<> _uid(0, 20);
+
+    double ldx, ldy, rux, ruy;
+
+    ldx = double(uid(gen));
+    ldy = double(uid(gen));
+
+    int m = _uid(gen);
+
+    if(m % int(randomCoefficient.first + sqrt(n)) == 0) {
+        rux = ldx + uid3(gen);
+        ruy = ldy + uid3(gen);
+    } else if(m % int(randomCoefficient.second + sqrt(n) / 6
+    ) == 0){
+        rux = ldx + uid2(gen);
+        ruy = ldy + uid2(gen);
+    } else {
+        rux = ldx + uid1(gen);
+        ruy = ldy + uid1(gen);
     }
 
-    while (inputRectangles.size() < n){
+    return {{ldx, ldy}, {rux, ruy}};
+}
+
+void GenerateTask41::GenerateInput() {
+    ifstream input;
+    if(!randomInput) {
+        input.open(pathname);
+    }
+
+    while (inputRectangles.size() < n) {
         Rectangle _new;
-        if(randomInput)
+        if (randomInput)
             _new = createRectangle();
         else {
             input >> _new.LeftDownPoint.x;
@@ -22,286 +119,123 @@ void GenerateTask41::GenerateTask() {
             input >> _new.RightUpperPoint.x;
             input >> _new.RightUpperPoint.y;
         }
-        if(inputRectangles.count(_new))
+        if (inputRectangles.count(_new))
             continue;
-
-        observer[0].insert({_new});
-        if(k == 1)
-            continue;
-        for(const auto &a: inputRectangles){
-            if(intersect(_new, a)){
-                observer[1].insert({_new, a});
-            }
-        }
-        if(k == 2)
-            continue;
-        //cout << "size " << observer.size() << endl;
-        for (int i = maxK; i > 0; --i) {
-            for(const auto &a: observer[i]){
-                bool intersectFlag = true;
-                for(const auto &b: a)
-                    if(!intersect(_new, b)){
-                        intersectFlag = false;
-                        break;
-                    }
-                if(intersectFlag){
-                    if(i == maxK && maxK < k - 2) {
-                        maxK++;
-                    }
-                    set<Rectangle> newSet = a;
-                    newSet.insert(_new);
-                    observer[i + 1].insert(newSet);
-                }
-            }
-        }
-//        for(const auto &a: observer){
-//            bool intersectFlag = true;
-//            for(const auto &b: a)
-//                if(!intersect(_new, b)){
-//                    intersectFlag = false;
-//                    break;
-//                }
-//            if(intersectFlag && a.size() <= k){
-//                set<Rectangle> newSet = a;
-//                newSet.insert(_new);
-//                observer.insert(newSet);
-//            }
-//        }
-        inputRectangles.insert(_new);
-        cout << inputRectangles.size() << endl << endl;
-//        cout << observer.size() << endl;
+        else
+            inputRectangles.insert(_new);
     }
-
-//    cout << endl << endl;
-//
-//    int counter = 0;
-//    for(const auto &a: observer)
-//        if(a.size() == k){
-//            counter++;
-//        }
-//
-//    cout << "size " << counter << endl;
-    cout << "waiting for answer" << endl;
-    answerRectangles = findAnswerRectangles3(observer[k - 1]);
-    cout << answerRectangles.size() << endl;
-
-    answerRectangles = createSolution(answerRectangles);
-    cout << answerRectangles.size() << endl;
-
-    functionForMakePictureInPython(inputRectangles, answerRectangles, answerRectangles);
-
-//    cout << "Input" << endl << inputRectangles << endl << "OBS" << endl;
-//    for(const auto &a: observer){
-//        cout << a << endl;
-//    }
+    cout << "Input size " <<inputRectangles.size() << endl;
+    ofstream output;
+    output.open(R"(C:\Users\User\CLionProjects\3k1s_Rectangles_41\X_output.txt)");
+    output << inputRectangles;
+    output.close();
 }
 
-
-/// СТАРАЯ ВЕРСИЯ ГЕНЕРАТОРА
-//    map<Rectangle, set<Rectangle>> observer;
-//
-//    bool randomInput = true;
-//    ifstream input;
-//    if(!pathname.empty()) {
-//        input.open(pathname);
-//        randomInput = false;
-//    }
-//
-//    while (inputRectangles.size() < n){
-//        Rectangle _new;
-//        if(randomInput)
-//            _new = createRectangle();
-//        else {
-//            input >> _new.LeftDownPoint.x;
-//            input >> _new.LeftDownPoint.y;
-//            input >> _new.RightUpperPoint.x;
-//            input >> _new.RightUpperPoint.y;
-//        }
-//        if(inputRectangles.count(_new))
-//            continue;
-//        observer[_new] = {};
-//        for (auto current: inputRectangles) {
-//            if(intersect(current, _new)){
-//                observer[current].insert(_new);
-//                observer[_new].insert(current);
-//            }
-//        }
-//        inputRectangles.insert(_new);
-//    }
-//    input.close();
-//    cout << endl << "Input" << endl;
-//    PrintRectangles(inputRectangles);
-//
-//    ofstream output;
-//    output.open(R"(C:\Users\User\CLionProjects\3k1s_Rectangles_41\X_output.txt)");
-//    output << inputRectangles;
-//
-//    //PrintObserver(observer);
-//
-//    set<Rectangle> forDel;
-//    set<set<Rectangle>> obs;
-//    for (auto a: observer) {
-//       // cout << "a: " << a.first;
-//        if(a.second.size() < k - 1)
-//            forDel.insert(a.first);
-//        else{
-//            for(auto b: a.second) {
-//                //cout << "b: " << b;
-//                int count = 0;
-//                for (const auto &c: a.second) {
-//                   // cout << "c: " << c;
-//                    if (b != c && intersect(b, c))
-//                        count ++;
-//                }
-//                if(count < k - 2)
-//                    observer[a.first].erase(b);
-//            }
-//            if(observer[a.first].size() < k - 1)
-//                forDel.insert(a.first);
-//            else {
-//                set<Rectangle> temp;
-//                temp += {a.first};
-//                temp += observer[a.first];
-//                obs.insert(temp);
-//            }
-//        }
-//    }
-//    for(const auto &a: forDel){
-//        observer.erase(a);
-//    }
-//
-//   // PrintObserver(observer);
-//
-//    cout << endl << "OBS" << endl;
-//    for(const auto &a: obs)
-//        cout << a << endl;
-//    cout << endl << endl;
-//    cout << "obs size :" << obs.size() << endl;
-//
-//    set<set<Rectangle>> obs2;
-//    cout << "waiting for answer..." << endl;
-//    for(const auto &a: obs){
-//        if(obs2.empty()){
-//            obs2.insert(a);
-//            continue;
-//        }
-//        bool flag = false;
-//        for(const auto &b: obs2){
-//            for(const auto &c: a){
-//                if(!b.count(c))
-//                    flag = true;
-//            }
-//        }
-//        if(flag)
-//            obs2.insert(a);
-//    }
-//
-//    cout << endl << "OBS2" << endl;
-//    for(const auto &a: obs2)
-//        cout << a << endl;
-//    cout << endl << endl;
-//    cout << "observer size :" << observer.size() << endl;
-//    cout << "obs2 size :" << obs2.size() << endl << endl;
-//
-//    set<Rectangle> tmp;
-//    tmp = findAnswerRectangles(observer);
-//    tmp = findAnswerRectangles3(obs2);
-//    PrintRectangles(tmp);
-//    if(!tmp.empty())
-//        answerRectangles = createSolution(tmp);
-//    answerRectangles = tmp;
-//    if(!answerRectangles.empty())
-//        functionForMakePictureInPython(inputRectangles, tmp, answerRectangles);
-//}
-
-Rectangle GenerateTask41::createRectangle() {
-    uniform_int_distribution<> uid0(0, n);
-    uniform_int_distribution<> uid1(int(n / 3), n);
-    uniform_int_distribution<> uid2(1, int (n / 40));
-    uniform_int_distribution<> uid3(int (n / 40), n);
-    uniform_int_distribution<> uid(0, 9);
-    uniform_int_distribution<> _uid(0, 9);
-
-    double ldx, ldy, rux, ruy;
-    ldx = double(uid0(gen));
-    ldy = double(uid0(gen));
-
-
-    if(_uid(gen) % 10 != 0) {
-        rux = ldx + uid2(gen);
-        ruy = ldy + uid2(gen);
-    } else{
-        rux = ldx + uid3(gen);
-        ruy = ldy + uid3(gen);
-    }
-
-    return {{ldx, ldy}, {rux, ruy}};
-}
-/// Старая версия решения
-//set<Rectangle> GenerateTask41::findAnswerRectangles(const map<Rectangle, set<Rectangle>>& intersectedRectangles) {
-//    set<Rectangle> result;
-//    set<Rectangle> why_not;
-//
-//    for(const auto& a: intersectedRectangles){
-//        why_not.clear();
-//        for(auto b: a.second){
-//            why_not.insert(resultOfIntersection(a.first, b));
-//        }
-//        if(k > 2) {
-//            for (int i = 0; i < k - 2; ++i) {
-//                if(why_not.empty())
-//                    break;
-//                vector<Rectangle> temp(begin(why_not), end(why_not));
-//                why_not.clear();
-//                for (int j = 0; j < temp.size() - 1; ++j) {
-//                    for (int l = j + 1; l < temp.size(); ++l) {
-//                        if(temp[j].RightUpperPoint.x < temp[l].LeftDownPoint.x)
-//                            break;
-//                        if(intersect(temp[j], temp[l]))
-//                            why_not.insert(resultOfIntersection(temp[j], temp[l]));
-//                    }
-//                }
-//            }
-//        }
-//        if(!why_not.empty()) {
-//            result += why_not;
-//        }
-//    }
-//    return result;
-//}
-//
-//
-//set<Rectangle> GenerateTask41::findAnswerRectangles2(const set<Rectangle> &intersectedRectangles) {
-//    set<Rectangle> why_not(begin(intersectedRectangles), end(intersectedRectangles));
-//    for (int i = 0; i < k - 1; ++i) {
-//        vector<Rectangle> temp(begin(why_not), end(why_not));;
-//        why_not.clear();
-//        for (int j = 0; j < temp.size() - 1; ++j) {
-//            for (int l = j + 1; l < temp.size(); ++l) {
-//                if (intersect(temp[j], temp[l]))
-//                    why_not.insert(resultOfIntersection(temp[j], temp[l]));
-//            }
-//        }
-//    }
-//    return why_not;
-//}
-
-set<Rectangle> GenerateTask41::findAnswerRectangles3(const set<set<Rectangle>> &obs) {
-    set<Rectangle> result;
-    for(const auto &a: obs){
-        if(a.size() == k){
-            Rectangle first;
-            bool firstFlag = true;
-            for (const auto &b: a) {
-                if(firstFlag){
-                    first = b;
-                    firstFlag = false;
-                    continue;
-                }
-                first = resultOfIntersection(first, b);
+set<Rectangle> GenerateTask41::basicTaskSolver(const set<Rectangle> &intersectedRectangles) {
+    set<Rectangle> why_not(begin(intersectedRectangles), end(intersectedRectangles));
+    for (int i = 0; i < k - 1; ++i) {
+        vector<Rectangle> temp(begin(why_not), end(why_not));;
+        why_not.clear();
+        for (int j = 0; j < temp.size() - 1; ++j) {
+            for (int l = j + 1; l < temp.size(); ++l) {
+                if (intersect(temp[j], temp[l]))
+                    why_not.insert(resultOfIntersection(temp[j], temp[l]));
             }
-            result.insert(first);
+        }
+        if(why_not.empty()) {
+            break;
         }
     }
-    return result;
+    if(!why_not.empty())
+        why_not = createSolution(why_not);
+    return why_not;
+}
+
+void GenerateTask41::Tester() {
+    ofstream ExcelTable;
+    ExcelTable.open(R"(C:\Users\User\CLionProjects\3k1s_Rectangles_41\Table.csv)");
+    ExcelTable << "N ;"
+               << "K ;"
+               << "steps count simple ;"
+               << "time simple ;"
+               << "attitude simple ;"
+               << ";"
+               << "steps count optimized ;"
+               << "rectangles count ;"
+               << "time optimized ;"
+               << "attitude optimized ;"
+               << endl;
+
+    for (int i = 5'000; i < 70'000; i += 3000) {
+        changeTask(i, k);
+        GenerateInput();
+        //GenerateTask();
+        int fat = 0;
+
+        if(n < 23'000) {
+            Solution_1 solver1(inputRectangles, k);
+            set<Rectangle> answerRectangles1 = solver1.taskSolver();
+            ofstream output3;
+            output3.open(R"(C:\Users\User\CLionProjects\3k1s_Rectangles_41\answer_output.txt)");
+            output3 << answerRectangles1;
+            output3.close();
+            fat = solver1.getTime();
+        }
+        Solution_2 solver2(inputRectangles, k);
+
+        set<Rectangle> answerRectangles2 = solver2.taskSolver();
+
+        ofstream output4;
+        output4.open(R"(C:\Users\User\CLionProjects\3k1s_Rectangles_41\rightFormAnswer.txt)");
+        output4 << answerRectangles2;
+        output4.close();
+
+
+        double secondAttitude = solver2.getTime() / solver2.getStepsCount();
+        cout << "size: "<<answerRectangles2.size() << endl;
+        cout << secondAttitude << endl << endl << endl;
+
+        ExcelTable << i << ";"
+                   << k << ";"
+                   << ";"
+                   << fat << ";"
+                   << ";"
+                   << ";"
+                   << solver2.getStepsCount() << ";"
+                   << answerRectangles2.size() << ";"
+                   << solver2.getTime() << ";"
+                   << secondAttitude << ";"
+                   << endl;
+    }
+
+    ExcelTable.close();
+}
+
+set<Rectangle> GenerateTask41::getInput() {
+    if(inputRectangles.empty()){
+        cout << "task not generated" << endl;
+        exit(-1);
+    }
+    return inputRectangles;
+}
+
+bool GenerateTask41::checkAnswer(const set<Rectangle> &answer) {
+    return (this->allSetPoints(answerRectangles) == this->allSetPoints(answer));
+}
+
+void GenerateTask41::changeTask(int _n, int _k) {
+    n = _n;
+    k = _k;
+}
+
+void GenerateTask41::changeRandCoefficients(pair<double, int> _rightBorder1Coefficient,
+                                            pair<double, int> _rightBorder2Coefficient,
+                                            pair<double, int> _rightBorder3Coefficient,
+                                            pair<int, int> _denominatorCoefficient,
+                                            pair<int, int> _randomCoefficient) {
+    rightBorder1Coefficient = _rightBorder1Coefficient;
+    rightBorder2Coefficient = _rightBorder2Coefficient;
+    rightBorder3Coefficient = _rightBorder3Coefficient;
+    denominatorCoefficient = _denominatorCoefficient;
+    randomCoefficient = _randomCoefficient;
 }
